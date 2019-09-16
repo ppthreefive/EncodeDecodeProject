@@ -3,7 +3,7 @@
 #include <vector>
 using namespace std;
 
-char input[] = "";
+vector<string> originalText;
 
 /*This function is designed to take the last character in each sorted line, and append it to a new string. 
 	This new string will then be compressed into character clusters. 
@@ -26,52 +26,64 @@ Where the integers in the string represent how many of that character there is i
 
 The 0 that we see in that example keeps track of what index in the sorted strings vector that the original string is seen.
 */
-void clusterize(vector<string> &sortedLines, string original) 
+string clusterize(vector<string> &sortedLines, string original) 
 {
 	string lastColumn = "";
 	string clusterized;
 	int originalIndex = 0;
+	int count = 0;
 
-	// This will give us a string for the last column in the sorted vector
-	for  (int i = 0; i < sortedLines.size(); i++)
+	if (sortedLines.at(count) != "") 
 	{
-		lastColumn.push_back(sortedLines.at(i).back());
-	}
-
-	// This will actually check for clustered characters in the lastColumn string
-	for (int i = 0; i < lastColumn.length(); i++)
-	{
-		int clusterCount = 1;
-		
-		for (int j = i + 1; j < lastColumn.length(); j++)
+		// This will give us a string for the last column in the sorted vector
+		for (int i = 0; i < sortedLines.size(); i++)
 		{
-			if (lastColumn.at(i) == lastColumn.at(j))
+			lastColumn.push_back(sortedLines.at(i).back());
+		}
+
+		// This will actually check for clustered characters in the lastColumn string
+		for (int i = 0; i < lastColumn.length(); i++)
+		{
+			int clusterCount = 1;
+
+			for (int j = i + 1; j < lastColumn.length(); j++)
 			{
-				clusterCount++;
-				i++;
+				if (lastColumn.at(i) == lastColumn.at(j))
+				{
+					clusterCount++;
+					i++;
+				}
+				else
+				{
+					break;
+				}
 			}
-			else 
+
+			clusterized += to_string(clusterCount) + lastColumn.at(i);
+		}
+
+		// This checks for which index the original string is stored in our sorted vector
+		for (int p = 0; p < sortedLines.size(); p++)
+		{
+			if (sortedLines.at(p) == original)
 			{
+				originalIndex = p;
 				break;
 			}
 		}
 
-		clusterized += to_string(clusterCount) + lastColumn.at(i);
-	}
+		clusterized = to_string(originalIndex) + "\n" + clusterized + "\n";
 
-	// This checks for which index the original string is stored in our sorted vector
-	for (int p = 0; p < sortedLines.size(); p++)
+		count++;
+	}
+	else 
 	{
-		if (sortedLines.at(p) == original) 
-		{
-			originalIndex = p;
-			break;
-		}
+		clusterized = "\n";
 	}
 
-	clusterized = to_string(originalIndex) + "\n" + clusterized;
+	//cout << clusterized << endl;
 
-	cout << endl << clusterized << endl;
+	return clusterized;
 }
 
 /* This function gets passed in the reference to the vector of shifted strings that we create with cyclicShifter function,
@@ -106,7 +118,7 @@ vector<string> insertionSort(vector<string> &shiftedLines)
 }
 
 /*This function was created to cyclically shift the string to the left by 1 character, by n number of times, where n = length of string. */
-vector<string> cyclicShifter(char line[], int length) 
+vector<string> cyclicShifter(string line, int length) 
 {
 	vector<string> shiftedLines;
 
@@ -138,47 +150,75 @@ vector<string> cyclicShifter(char line[], int length)
 	return shiftedLines;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	vector<string> shiftedLines;
-	vector<string> sortedLines;
-	string original;
-	
-	cout << "Enter string to be sorted: ";
-	cin >> input;
+	string argument;
+	string line;
+	string output;
 
-	original = input;
-	
-	int length = strlen(input);
-	shiftedLines = cyclicShifter(input, length);
-
-	cout << shiftedLines.size() << endl;
-
-	for (int i = 0; i < shiftedLines.size(); i++)
+	for (int i = 1; i < argc; i++)
 	{
-		string toPrint = "";
-
-		toPrint = shiftedLines.at(i);
-
-		cout << toPrint << endl;
+		argument += argv[i];
+		argument += "\n";
 	}
 
-	cout << endl;
+	/* This will check that the amount of arguments is at least equal to 2, and checks if the second argument is equal to either of the keywords.
+			If neither conditions are met, the program closes and a quick error message is displayed in console.
 
-	sortedLines = insertionSort(shiftedLines);
+		It's also possible to use keyboard input if an input string is not specified.
+			For example, the input: "encode.exe insertion" with no file redirects will allow the user to input their own strings.
 
-	for (int i = 0; i < sortedLines.size(); i++)
+			In order to end the input of strings, the user will need to type Ctrl+Z (Windows) or Ctrl+D (Unix) and then hit return.
+
+			The program will then do work on those strings and then output the results to console instead of a file.
+	*/
+	if (argc == 2 && (argument.find("insertion") != string::npos || argument.find("merge") != string::npos))
 	{
-		string toPrint = "";
+		while (getline(cin, line))
+		{
+			originalText.push_back(line);
+		}
+	}
+	else 
+	{
+		cout << "ERROR: Incorrect syntax for using this program. Please use keyword \"insertion\" or \"merge\"," << endl;
+		cout << "\tand specify and input and output file using <*input.txt* and >*output.txt* respectively." << endl;
+		cout << "An example would be: \"encode.exe insertion <input.txt >output.txt\" without quotations." << endl;
 
-		toPrint = sortedLines.at(i);
-
-		cout << toPrint << endl;
+		return 0;
 	}
 
-	cout << endl;
+	// This conditional statement just checks to see if there are any arguments passed besides just the program name
+	if (argc > 1)
+	{
+		for (int i = 0; i < originalText.size(); i++)
+		{
+			vector<string> manipulatedStrings;
+			int length = originalText.at(i).length();
 
-	clusterize(sortedLines, original);
+			// This will check to see if the substring "insertion" or "merge" exists in argument, and is basically an operations selector.
+			// NOTE: This is case sensitive, so "INSERTION" for example would cause the program to exit.
+			if (argument.find("insertion") != string::npos)
+			{
+				manipulatedStrings = cyclicShifter(originalText.at(i), length);
+				manipulatedStrings = insertionSort(manipulatedStrings);
+				output += clusterize(manipulatedStrings, originalText.at(i));
+			}
+			else if (argument.find("merge") != string::npos)
+			{
+				// Do nothing, merge sort not implemented yet
+			}
+			else
+			{
+				// The program will exit if insertion or merge not detected in input
+				return 0;
+			}
+		}
+	}
+
+	// This will output to either a file specified at Command Line, or will just output into Command Line if no file specified.
+	// I.E. "<encoded-output.txt"
+	cout << output;
 
 	return 0;
 }
