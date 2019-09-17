@@ -1,3 +1,22 @@
+/*	Name: Phillip Pham
+	Course: CSE310, Section: 84794
+	Instructor: Dr. Violet R. Syrotiuk
+
+	Program Title: encode
+		Description: This is a program that will encode an input of strings, line by line, by cyclically shifting characters
+			to the left once, for an N amount of times. N is equal to the amount of characters in the string. Those resulting N
+			strings will then be sorted lexicographically using insertion or merge sort, depending on what the user selects.
+			Once the strings are sorted, the last character in each sorted string, in order, is appended to a new string
+			which represents the last column. The characters are then clusterized to form the encoded string. The original
+			string is also kept track of, and appended to the final clusterized string.
+
+	Test cases have been provided in the project PDF and on Canvas, and are located in the debug folder.
+
+	These articles have been referenced in helping make this program:
+		http://www.cplusplus.com/reference/string/string/
+		http://www.cplusplus.com/reference/vector/vector/
+*/
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -80,8 +99,6 @@ string clusterize(vector<string> &sortedLines, string original)
 	{
 		clusterized = "\n";
 	}
-
-	//cout << clusterized << endl;
 
 	return clusterized;
 }
