@@ -78,7 +78,7 @@ string clusterize(vector<string> &sortedLines, string original)
 				}
 			}
 
-			clusterized += to_string(clusterCount) + " " + lastColumn.at(i) + " ";
+			clusterized += to_string(clusterCount) + lastColumn.at(i);
 		}
 
 		// This checks for which index the original string is stored in our sorted vector
