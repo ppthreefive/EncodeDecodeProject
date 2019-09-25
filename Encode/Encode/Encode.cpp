@@ -81,6 +81,9 @@ string clusterize(vector<string> &sortedLines, string original)
 			clusterized += to_string(clusterCount) + " " + lastColumn.at(i) + " ";
 		}
 
+		// Gets rid of that last space at the end of the encoded string
+		clusterized = clusterized.substr(0, clusterized.length() - 1);
+
 		// This checks for which index the original string is stored in our sorted vector
 		for (int p = 0; p < sortedLines.size(); p++)
 		{
@@ -134,6 +137,65 @@ vector<string> insertionSort(vector<string> &shiftedLines)
 	return shiftedLines;
 }
 
+void merge(vector<string> &left, vector<string> &right, vector<string> &data)
+{
+	vector<int>::size_type numLeft = left.size();
+	vector<int>::size_type numRight = right.size();
+
+	vector<int>::size_type i = 0, j = 0, k = 0;
+
+	while (j < numLeft && k < numRight)
+	{
+		if (left[j] < right[k])
+		{
+			data[i] = left[j];
+			j++;
+		}
+		else
+		{
+			data[i] = right[k];
+			k++;
+		}
+
+		i++;
+	}
+	while (j < numLeft)
+	{
+		data[i] = left[j];
+		j++;
+		i++;
+	}
+	while (k < numRight)
+	{
+		data[i] = right[k];
+		k++;
+		i++;
+	}
+}
+
+void mergeSort(vector<string> &shiftedLines)
+{
+	if (shiftedLines.size() <= 1) return;
+
+	vector<int>::size_type mid = shiftedLines.size() / 2;
+
+	vector<string> left;
+	vector<string> right;
+
+	for (vector<int>::size_type j = 0; j < mid; j++)
+	{
+		left.push_back(shiftedLines[j]);
+	}
+	for (vector<int>::size_type j = 0; j < (shiftedLines.size()) - mid; j++)
+	{
+		right.push_back(shiftedLines[mid + j]);
+	}
+
+	mergeSort(left);
+	mergeSort(right);
+	merge(left, right, shiftedLines);
+}
+
 /*This function was created to cyclically shift the string to the left by 1 character, by n number of times, where n = length of string. */
 vector<string> cyclicShifter(string line, int length) 
 {
@@ -166,6 +228,7 @@ vector<string> cyclicShifter(string line, int length)
 
 	return shiftedLines;
 }
+
 
 int main(int argc, char* argv[])
 {
@@ -223,7 +286,9 @@ int main(int argc, char* argv[])
 			}
 			else if (argument.find("merge") != string::npos)
 			{
-				// Do nothing, merge sort not implemented yet
+				manipulatedStrings = cyclicShifter(originalText.at(i), length);
+				mergeSort(manipulatedStrings);
+				output += clusterize(manipulatedStrings, originalText.at(i));
 			}
 			else
 			{
