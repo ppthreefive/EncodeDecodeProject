@@ -137,13 +137,22 @@ vector<string> insertionSort(vector<string> &shiftedLines)
 	return shiftedLines;
 }
 
+/* Takes all the split subvectors of size 1 from the recursive function mergeSort() and does the merging/sorting here.
+
+	By using pass by reference, the vector that was originally passed into function mergeSort() is actually being modified,
+	with the only auxiliary vectors being the left and right vectors that are also passed in.
+*/
 void merge(vector<string> &left, vector<string> &right, vector<string> &data)
 {
+	// Create integer variables that represent the amount of elements in the left and right halves respectively
 	vector<int>::size_type numLeft = left.size();
 	vector<int>::size_type numRight = right.size();
 
+	// Initialize the iterators
 	vector<int>::size_type i = 0, j = 0, k = 0;
 
+	// Loops to compare which element in the left or right vector is larger, and then swaps to the corresponding spot
+	// in the original vector noted by the iterator i
 	while (j < numLeft && k < numRight)
 	{
 		if (left[j] < right[k])
@@ -159,6 +168,8 @@ void merge(vector<string> &left, vector<string> &right, vector<string> &data)
 
 		i++;
 	}
+
+	// These loops fill in the resulting vector with any remaining elements
 	while (j < numLeft)
 	{
 		data[i] = left[j];
@@ -173,15 +184,30 @@ void merge(vector<string> &left, vector<string> &right, vector<string> &data)
 	}
 }
 
+/* This is the divide and conquer sorting algorithm that splits a vector as many times as it needs until each subvector is a size of 1 element.
+	It will recursively call itself to keep splitting the vectors, and once each vector is a size of 1, it finally reaches the merge() function call,
+	Which takes those split vectors of size 1 and merges them all together in sorted order.
+
+	We only need to pass in the shiftedLines vector which was created by the cyclicShifter() function.
+
+	For some reason, I was getting issues using int type for my iterators, so I had to use vector<int>::size_type instead.
+*/
 void mergeSort(vector<string> &shiftedLines)
 {
-	if (shiftedLines.size() <= 1) return;
+	// If size is less than or equal to 1, vector is already sorted.
+	if (shiftedLines.size() <= 1)
+	{
+		return;
+	}
 
+	// Find the midpoint of the vector
 	vector<int>::size_type mid = shiftedLines.size() / 2;
 
+	// Initialize 2 vectors that will hold the left and right halves of the shifted vector
 	vector<string> left;
 	vector<string> right;
 
+	// Populate the left and right half vectors
 	for (vector<int>::size_type j = 0; j < mid; j++)
 	{
 		left.push_back(shiftedLines[j]);
@@ -191,6 +217,7 @@ void mergeSort(vector<string> &shiftedLines)
 		right.push_back(shiftedLines[mid + j]);
 	}
 
+	// Split the left and ride sides until each vector is size of 1 element, and then go to merge function to sort
 	mergeSort(left);
 	mergeSort(right);
 	merge(left, right, shiftedLines);
@@ -228,7 +255,6 @@ vector<string> cyclicShifter(string line, int length)
 
 	return shiftedLines;
 }
-
 
 int main(int argc, char* argv[])
 {
