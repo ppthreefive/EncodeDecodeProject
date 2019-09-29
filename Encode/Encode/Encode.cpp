@@ -100,7 +100,7 @@ string clusterize(vector<string> &sortedLines, string original)
 	}
 	else 
 	{
-		clusterized = "\n";
+		clusterized = to_string(originalIndex) + "\n\n";
 	}
 
 	return clusterized;
