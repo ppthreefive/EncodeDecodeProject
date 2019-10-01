@@ -8,3 +8,5 @@
 #Typing 'make' will invoke the first target entry in the file
 encode: encode.cpp
 	g++ -std=c++0x -o encode encode.cpp
+decode: decode.cpp
+	g++ -std=c++0x -o decode decode.cpp
